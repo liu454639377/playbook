@@ -1,0 +1,9 @@
+---
+- name: Install nginx
+  hosts: webserver
+  remote_user: root
+
+
+  roles:
+    - nginx
+    

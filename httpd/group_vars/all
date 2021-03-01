@@ -1,0 +1,2 @@
+nginx_port: 8888
+server_hostname: test.com
