@@ -1,0 +1,13 @@
+[k8s]
+k8s-master
+k8s-node1
+k8s-node2
+[k8s:vars]
+ansible_ssh_user=root
+ansible_ssh_pass=www.1ue.com
+ansible_ssh_port=22
+[k8s_master]
+k8s-master host_name=k8s-master
+[k8s_node]
+k8s-node1 host_name=k8s-node1
+k8s-node2 host_name=k8s-node2

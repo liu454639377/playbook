@@ -1,0 +1,36 @@
+---
+- name: install kubectl,kubeadm,kubelet
+  yum: 
+      name: ['kubectl-{{kube_version}}', 'kubeadm-{{kube_version}}', 'kubelet-{{kube_version}}']
+      state: present      
+- name: kube get images
+  script: ./image.sh
+- name: hostname
+  hostname: 'name={{host_name}}'
+
+- name: init k8s
+  shell: kubeadm init --image-repository registry.aliyuncs.com/google_containers --kubernetes-version {{k8s_version}} --apiserver-advertise-address {{k8s_master}}  --pod-network-cidr=10.244.0.0/16 --token-ttl 0
+
+- name: config kube
+  shell: mkdir -p $HOME/.kube && cp -i /etc/kubernetes/admin.conf $HOME/.kube/config && chown $(id -u):$(id -g) $HOME/.kube/config
+
+- name: copy calico yaml file
+  copy: src=./calico.yaml dest=/tmp/ owner=root group=root mode=0644
+- name: copy hosts file
+  template: src=hosts.j2 dest=/etc/hosts
+
+- name: systemctl startd
+  service:
+      name: kubelet
+      state: started
+      enabled: yes
+
+- name: install calico
+  shell: kubectl apply -f /tmp/calico.yaml
+- name: get join command
+  shell: kubeadm token create --print-join-command
+  register: join_command
+
+- name: show join command
+  debug: var=join_command verbosity=0
+

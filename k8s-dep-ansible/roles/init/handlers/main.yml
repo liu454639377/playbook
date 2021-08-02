@@ -1,0 +1,3 @@
+---
+- name: restart bee1
+  service:  name=bee1 state=restarted

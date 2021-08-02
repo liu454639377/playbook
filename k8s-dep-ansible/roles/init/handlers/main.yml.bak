@@ -1,0 +1,4 @@
+---
+- name: restart bee
+  service: name = "{{ item }}" state=restarted enabled=yes
+  with_items: "{{ bee_server }}"

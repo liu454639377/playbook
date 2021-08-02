@@ -1,0 +1,8 @@
+kube_version: 1.21.2
+k8s_version: v1.21.2
+k8s_master: 192.168.122.3
+k8s_master_name: k8s-master
+k8s_node1_name: k8s-node1
+k8s_node2_name: k8s-node2
+token: m3htnf.i3ggpd1ubpm2tss2
+cert_hash: 899d3f13d1a750ba2713a789a3427e70cc08dd259f475caec4f538749368ae7d

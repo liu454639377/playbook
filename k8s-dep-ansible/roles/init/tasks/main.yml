@@ -1,0 +1,7 @@
+---
+- name: k8s_init
+  script: ./pre-setup.sh 
+  register: line_out
+- debug:
+    var: line_out.stdout_lines
+

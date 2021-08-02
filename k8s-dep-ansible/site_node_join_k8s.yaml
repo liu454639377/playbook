@@ -1,0 +1,7 @@
+---
+- name: kube-join
+  hosts: k8s_node
+  remote_user: root
+  roles:
+    - kube_join
+    

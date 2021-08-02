@@ -1,0 +1,4 @@
+---
+-  name: upgradekernel
+   script: ./upgrade.sh
+

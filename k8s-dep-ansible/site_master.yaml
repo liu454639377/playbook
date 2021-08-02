@@ -1,0 +1,7 @@
+---
+- name: kube_master
+  hosts: k8s_master
+  remote_user: root
+  roles:
+    - kube_master
+    

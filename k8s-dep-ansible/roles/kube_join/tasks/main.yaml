@@ -1,0 +1,25 @@
+--- 
+- name: install kubectl,kubeadm,kubelet
+  yum: 
+      name: ['kubectl-{{kube_version}}', 'kubeadm-{{kube_version}}', 'kubelet-{{kube_version}}']
+      state: present      
+- name: kube get images
+  script: ./image.sh
+
+
+
+- name: copy calico yaml file
+  copy: src=./calico.yaml dest=/tmp/ owner=root group=root mode=0644
+- name: copy hosts file
+  template: src=hosts.j2 dest=/etc/hosts
+- name: hostname
+  hostname: 'name={{host_name}}'
+
+- name: systemctl startd
+  service:
+      name: kubelet
+      state: started
+      enabled: yes
+- name: join kube
+  shell: kubeadm join {{k8s_master}}:6443 --token {{token}} --discovery-token-ca-cert-hash sha256:{{cert_hash}} 
+

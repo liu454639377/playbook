@@ -1,0 +1,31 @@
+#!/bin/bash
+if [ $# -ne 2 ]; then
+echo "Usage: beenodegen.sh startnum totalnumber";
+exit;
+else
+/root/genEth.sh $2;
+let i=$1;
+ls -l /var/lib/bee-clef/keystore/ | grep UTC | awk {'print $9'} | cut -d- -f9 | sed 's/^/0x/' > /root/address;
+mkdir /etc/bee;
+cat /root/address | while read line; do
+/usr/bin/cp -p /root/bee.exe.template /usr/local/bin/bee$i;
+cat /root/bee.yaml.template > /tmp/bee.yaml.template;
+echo "api-addr: :160$i">> /tmp/bee.yaml.template;
+echo "clef-signer-ethereum-address: "$line"" >> /tmp/bee.yaml.template;
+echo "debug-api-addr: 127.0.0.1:161$i" >> /tmp/bee.yaml.template;
+echo "p2p-addr: :162$i" >> /tmp/bee.yaml.template;
+echo "config: /etc/bee/bee$i.yaml" >> /tmp/bee.yaml.template;
+echo "data-dir: /data/bee$i" >> /tmp/bee.yaml.template;
+echo "swap-deployment-gas-price: " {{ swap-deployment-gas-price }} >> /tmp/bee.yaml.template;
+cat /tmp/bee.yaml.template > /etc/bee/bee$i.yaml;
+mkdir /data/bee$i;
+
+cat /root/service.template > /tmp/service.template;
+echo "ExecStart=/usr/local/bin/bee$i start --config /etc/bee/bee$i.yaml" >> /tmp/service.template;
+cat /tmp/service.template > /usr/lib/systemd/system/bee$i.service
+/usr/sbin/service bee$i start;
+let "i=i+1";
+done
+
+fi
+

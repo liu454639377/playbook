@@ -1,0 +1,49 @@
+---
+- name: install kubectl,kubeadm,kubelet
+  yum: 
+      name: ['kubectl-{{kube_version}}', 'kubeadm-{{kube_version}}', 'kubelet-{{kube_version}}']
+      state: present      
+- name: kube get images
+  script: ./image.sh
+
+- name: hostname
+  hostname: 'name={{host_name}}'
+
+- name: copy kubeadmin file
+  template: src=kubeadm.j2 dest=/tmp/kubeadmin.yaml
+
+- name: init k8s
+  shell: kubeadm init --config /tmp/kubeadmin.yaml >> /tmp/kubelog.log
+
+- name: config kube
+  shell: mkdir -p $HOME/.kube && cp -i /etc/kubernetes/admin.conf $HOME/.kube/config && chown $(id -u):$(id -g) $HOME/.kube/config
+
+- name: copy calico yaml file
+  copy: src=./calico.yaml dest=/tmp/ owner=root group=root mode=0644
+
+- name: copy hosts file
+  template: src=hosts.j2 dest=/etc/hosts
+
+- name: systemctl startd
+  service:
+      name: kubelet
+      state: started
+      enabled: yes
+
+- name: install calico
+  shell: kubectl apply -f /tmp/calico.yaml
+
+- name: controller.yaml
+  shell: sed -i '/port=0/d' /etc/kubernetes/manifests/kube-controller-manager.yaml
+
+- name: scheduler.yaml
+  shell: sed -i '/port=0/d' /etc/kubernetes/manifests/kube-scheduler.yaml
+
+- name: get join command
+  #shell: kubeadm token create --print-join-command
+  shell: kubeadm token list
+  register: join_command
+
+- name: show join command
+  debug: var=join_command verbosity=0
+
